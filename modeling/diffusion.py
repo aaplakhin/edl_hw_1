@@ -23,7 +23,6 @@ class DiffusionModel(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         timestep = torch.randint(1, self.num_timesteps + 1, (x.shape[0],)).to(x.device)
         eps = torch.randn_like(x)
-        print(timestep.device)
         x_t = (
                 self.sqrt_alphas_cumprod[timestep, None, None, None] * x
                 + torch.sqrt(1 - self.one_minus_alpha_over_prod)[timestep, None, None, None] * eps

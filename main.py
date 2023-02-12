@@ -1,4 +1,5 @@
 import torch
+import wandb
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import CIFAR10
@@ -9,6 +10,8 @@ from modeling.unet import UnetModel
 
 
 def main(device: str, num_epochs: int = 100):
+    wandb.init(project='edl_hw1')
+
     ddpm = DiffusionModel(
         eps_model=UnetModel(3, 3, hidden_size=128),
         betas=(1e-4, 0.02),
@@ -33,7 +36,7 @@ def main(device: str, num_epochs: int = 100):
     for i in range(num_epochs):
         train_epoch(ddpm, dataloader, optim, device)
         generate_samples(ddpm, device, f"samples/{i:02d}.png")
-
+        wandb.log({'lr': optim.lr})
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
