@@ -36,10 +36,13 @@ def main(device: str, num_epochs: int = 100):
 
     for i in range(num_epochs):
         train_epoch(ddpm, dataloader, optim, device)
-        if not os.path.exists(path):
-            os.makedirs(path)
+
+        if not os.path.exists('samples/'):
+            os.makedirs('samples/')
+
         generate_samples(ddpm, device, f"samples/{i:02d}.png")
         wandb.log({'lr': optim.lr})
+
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
