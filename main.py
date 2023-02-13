@@ -52,9 +52,9 @@ def main(cfg: DictConfig):
         if not os.path.exists('samples/'):
             os.makedirs('samples/')
 
-        grid = generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png")
+        generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png")
 
-        wandb.log({"Image" : wandb.Image("samples/{i:02d}.png")})
+        wandb.log({"Image" : wandb.Image(f"samples/{i:02d}.png")})
 
 
 def main_cfg(cfg_name: str = "default"):
