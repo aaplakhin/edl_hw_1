@@ -1,4 +1,5 @@
 import torch
+import wandb
 from torch.optim.optimizer import Optimizer
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid, save_image
@@ -25,6 +26,8 @@ def train_epoch(model: DiffusionModel, dataloader: DataLoader, optimizer: Optimi
         loss_ema = train_loss if loss_ema is None else 0.9 * loss_ema + 0.1 * train_loss
         pbar.set_description(f"loss: {loss_ema:.4f}")
 
+        wandb.log({'train_loss': train_loss.item()})
+
 
 def generate_samples(model: DiffusionModel, device: str, path: str):
     model.eval()
@@ -32,3 +35,4 @@ def generate_samples(model: DiffusionModel, device: str, path: str):
         samples = model.sample(8, (3, 32, 32), device=device)
         grid = make_grid(samples, nrow=4)
         save_image(grid, path)
+        return grid
