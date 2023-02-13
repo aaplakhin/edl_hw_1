@@ -14,7 +14,7 @@ from modeling.unet import UnetModel
 
 def main(cfg: DictConfig):
 
-    wandb.run.log_code(f"conf/{cfg.name}.yaml")
+    wandb.run.log_code(f"configs/{cfg.name}.yaml")
 
     ddpm = DiffusionModel(
         eps_model=UnetModel(*cfg.unet_params),
