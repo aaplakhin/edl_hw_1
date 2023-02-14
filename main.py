@@ -12,7 +12,9 @@ from modeling.training import generate_samples, train_epoch
 from modeling.unet import UnetModel
 
 
+@hydra.main(version_base=None, config_path="configs", config_name="default")
 def main(cfg: DictConfig):
+    wandb.init(project=cfg.name, config=OmegaConf.to_container(cfg))
 
     wandb.run.log_code(root='configs', name='default',
                        include_fn=lambda path: path.endswith(".yaml"))
@@ -55,17 +57,8 @@ def main(cfg: DictConfig):
 
         generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png")
 
-        wandb.log({"Image" : wandb.Image(f"samples/{i:02d}.png")})
-
-
-def main_cfg(cfg_name: str = "default"):
-    @hydra.main(version_base=None, config_path="configs", config_name=cfg_name)
-    def _main(cfg: DictConfig):
-        main(cfg=cfg)
-
-    _main()
+        wandb.log({"Image": wandb.Image(f"samples/{i:02d}.png")})
 
 
 if __name__ == "__main__":
-    wandb.init(project='hw_edl_exp')
-    main_cfg()
+    main()
