@@ -48,7 +48,7 @@ def main(cfg: DictConfig):
         transform=train_transforms,
     )
 
-    wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:128]]})
+    wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:]]})
 
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size,
                             num_workers=cfg.num_workers,
@@ -69,7 +69,7 @@ def main(cfg: DictConfig):
 
         generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
 
-        wandb.log({"1st row - noise, 2nd row - generated samples": wandb.Image(f"samples/{i:02d}.png")})
+        wandb.log({"samples": wandb.Image(f"samples/{i:02d}.png")})
 
 
 if __name__ == "__main__":
