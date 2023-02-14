@@ -5,6 +5,7 @@ eps_adam: 1e-08
 lr: 1e-5
 batch_size: 128
 num_workers: 4
+has_flip: False
 flip_prob: 0.05
 unet_params: [3, 3, 128]
 diffusion_params: [1e-4, 0.02]

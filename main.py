@@ -28,15 +28,18 @@ def main(cfg: DictConfig):
     )
 
     ddpm.to(cfg.device)
-
-    train_transforms = transforms.Compose(
-        [
-            transforms.ToTensor(),
-            transforms.RandomHorizontalFlip(p=cfg.flip_prob),
-            transforms.RandomVerticalFlip(p=cfg.flip_prob),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-        ]
-    )
+    if cfg.has_flip:
+        train_transforms = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.RandomHorizontalFlip(p=cfg.flip_prob),
+                transforms.RandomVerticalFlip(p=cfg.flip_prob),
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            ]
+        )
+    else:
+        train_transforms = transforms.Compose([transforms.ToTensor(),
+                                               transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     dataset = CIFAR10(
         "cifar10",
@@ -64,12 +67,8 @@ def main(cfg: DictConfig):
         if not os.path.exists('samples/'):
             os.makedirs('samples/')
 
-        if not os.path.exists('noise/'):
-            os.makedirs('noise/')
+        generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
 
-        generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png",  f"noise/{i:02d}.png")
-
-        wandb.log({"Image": wandb.Image(f"noise/{i:02d}.png")})
         wandb.log({"Image": wandb.Image(f"samples/{i:02d}.png")})
 
 

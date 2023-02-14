@@ -29,12 +29,10 @@ def train_epoch(model: DiffusionModel, dataloader: DataLoader, optimizer: Optimi
         wandb.log({'train_loss': train_loss.item()})
 
 
-def generate_samples(model: DiffusionModel, device: str, path_noise: str, path_samples: str):
+def generate_samples(model: DiffusionModel, device: str, path: str, num_epoch: int):
     model.eval()
     with torch.no_grad():
-        noise, samples = model.sample(8, (3, 32, 32), device=device)
-        grid_noise = make_grid(noise, nrow=8)
-        grid_samples = make_grid(samples, nrow=8)
-        save_image(grid_noise, path_noise)
-        save_image(grid_samples, path_samples)
-        return grid_noise, grid_samples
+        samples = model.sample(8, (3, 32, 32), device, num_epoch)
+        grid = make_grid(samples, nrow=8)
+        save_image(grid, path)
+        return grid
