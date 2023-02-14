@@ -1,4 +1,4 @@
-name: "default"
+name: "default_config"
 device: "cuda"
 optimizer: "adam"
 eps_adam: 1e-08

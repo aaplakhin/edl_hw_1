@@ -16,7 +16,9 @@ from modeling.unet import UnetModel
 def main(cfg: DictConfig):
     wandb.init(project=cfg.name, config=OmegaConf.to_container(cfg))
 
-    wandb.run.log_code(root='configs', name='default',
+    OmegaConf.save(cfg, "outputs/temp_cfg.yaml")
+
+    wandb.run.log_code(root='outputs', name='temp_cfg',
                        include_fn=lambda path: path.endswith(".yaml"))
 
     ddpm = DiffusionModel(
