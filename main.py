@@ -30,7 +30,12 @@ def main(cfg: DictConfig):
     ddpm.to(cfg.device)
 
     train_transforms = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+        [
+            transforms.ToTensor(),
+            transforms.RandomHorizontalFlip(p=cfg.flip_prob),
+            transforms.RandomVerticalFlip(p=cfg.flip_prob),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ]
     )
 
     dataset = CIFAR10(
@@ -39,6 +44,8 @@ def main(cfg: DictConfig):
         download=True,
         transform=train_transforms,
     )
+
+    wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:128]]})
 
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size,
                             num_workers=cfg.num_workers,
