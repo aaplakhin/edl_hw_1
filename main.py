@@ -64,8 +64,12 @@ def main(cfg: DictConfig):
         if not os.path.exists('samples/'):
             os.makedirs('samples/')
 
-        generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png")
+        if not os.path.exists('noise/'):
+            os.makedirs('noise/')
 
+        generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png",  f"noise/{i:02d}.png")
+
+        wandb.log({"Image": wandb.Image(f"noise/{i:02d}.png")})
         wandb.log({"Image": wandb.Image(f"samples/{i:02d}.png")})
 
 

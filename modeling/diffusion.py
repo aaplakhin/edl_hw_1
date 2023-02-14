@@ -25,22 +25,23 @@ class DiffusionModel(nn.Module):
         eps = torch.randn_like(x)
         x_t = (
                 self.sqrt_alphas_cumprod[timestep, None, None, None] * x
-                + torch.sqrt(1 - self.one_minus_alpha_over_prod)[timestep, None, None, None] * eps
+                + self.sqrt_one_minus_alpha_prod[timestep, None, None, None] * eps
         )
 
         return self.criterion(eps, self.eps_model(x_t, timestep / self.num_timesteps))
 
-    def sample(self, num_samples: int, size, device) -> torch.Tensor:
-
+    def sample(self, num_samples: int, size, device) -> tuple[Tensor, Union[Tensor, Any]]:
+        torch.manual_seed(666)
         x_i = torch.randn(num_samples, *size, device=device)
+        x_0 = x_i
 
         for i in range(self.num_timesteps, 0, -1):
             z = torch.randn(num_samples, *size, device=device) if i > 1 else 0
             eps = self.eps_model(x_i, torch.tensor(i / self.num_timesteps).repeat(num_samples, 1).to(device))
-            x_i = self.inv_sqrt_alphas[i].to(device) * (x_i - eps * self.one_minus_alpha_over_prod[i].to(device)) + \
+            x_i = self.inv_sqrt_alphas[i].to(device) * (x_i - self.one_minus_alpha_over_prod.to(device) * eps) + \
                   (self.sqrt_betas[i] * z).to(device)
 
-        return x_i
+        return x_0, x_i
 
 
 def get_schedules(beta1: float, beta2: float, num_timesteps: int) -> Dict[str, torch.Tensor]:
