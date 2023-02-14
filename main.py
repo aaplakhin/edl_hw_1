@@ -61,11 +61,11 @@ def main(cfg: DictConfig):
     else:
         raise NotImplemented("This project does not support other optimizers")
 
+    if not os.path.exists('samples/'):
+        os.makedirs('samples/')
+
     for i in range(cfg.num_epochs):
         train_epoch(ddpm, dataloader, optim, cfg.device)
-
-        if not os.path.exists('samples/'):
-            os.makedirs('samples/')
 
         generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
 
