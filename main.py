@@ -67,5 +67,5 @@ def main_cfg(cfg_name: str = "default"):
 
 
 if __name__ == "__main__":
-    wandb.init(project='hw_edl')
+    wandb.init(project='hw_edl_exp')
     main_cfg("default")
