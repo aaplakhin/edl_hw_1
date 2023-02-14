@@ -48,7 +48,7 @@ def main(cfg: DictConfig):
         transform=train_transforms,
     )
 
-    wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:]]})
+    wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:64]]})
 
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size,
                             num_workers=cfg.num_workers,
