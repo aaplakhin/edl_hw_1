@@ -48,6 +48,7 @@ def test_train_on_one_batch(device, train_dataset):
 
 @pytest.mark.parametrize(["device"], [["cpu"], ["cuda"]])
 def test_training(device):
+
     cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../configs/default.yaml")
 
     cfg.device = device

@@ -11,3 +11,4 @@ unet_params: [3, 3, 128]
 diffusion_params: [1e-4, 0.02]
 num_timesteps: 1000
 num_epochs: 100
+api_key: f584b3b7e8a09e6e6af3c36642280e28f629a518

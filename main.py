@@ -14,6 +14,7 @@ from modeling.unet import UnetModel
 
 @hydra.main(version_base=None, config_path="configs", config_name="default")
 def main(cfg: DictConfig):
+    wandb.login(key=cfg.api_key)
     wandb.init(project=cfg.name, config=OmegaConf.to_container(cfg))
 
     if not os.path.exists("used_configs/"):
