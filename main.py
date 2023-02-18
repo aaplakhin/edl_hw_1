@@ -22,7 +22,7 @@ def main(cfg: DictConfig):
 
     OmegaConf.save(cfg, f"used_configs/used_config_{cfg.cfg_name}.yaml")
 
-    wandb.run.log_code(root="used_configs", name="used_config",
+    wandb.run.log_code(root="used_configs", name=f"used_config_{cfg.cfg_name}.yaml",
                        include_fn=lambda path: path.endswith(".yaml"))
 
     ddpm = DiffusionModel(
