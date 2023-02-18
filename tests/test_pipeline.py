@@ -1,15 +1,14 @@
 import pytest
 import torch
 import os
-import wandb
 
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import CIFAR10
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 
 from modeling.diffusion import DiffusionModel
-from modeling.training import train_step, train_epoch
+from modeling.training import train_step
 from modeling.unet import UnetModel
 from main import main
 
@@ -47,8 +46,8 @@ def test_train_on_one_batch(device, train_dataset):
 
 
 @pytest.mark.parametrize(["device"], [["cpu"], ["cuda"]])
-def test_training_epoch_gpu_with_hydra(device):
-    cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../configs/default.yaml")
+def test_training_epoch_with_hydra(device):
+    cfg = OmegaConf.load(f"configs/default.yaml")
 
     cfg.num_epochs, cfg.device, cfg.cfg_name = 1, device, f"test_1_epoch_{device}"
 
@@ -60,7 +59,7 @@ def test_training_epoch_gpu_with_hydra(device):
 
     assert os.path.exists(f"used_configs/used_config_{cfg.cfg_name}.yaml")
 
-    used_cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../used_configs/used_config_{cfg.cfg_name}.yaml")
+    used_cfg = OmegaConf.load(f"used_configs/used_config_{cfg.cfg_name}.yaml")
 
     assert used_cfg.num_epochs == 1
 
@@ -70,3 +69,23 @@ def test_training_epoch_gpu_with_hydra(device):
         assert losses["train_loss_ema"] < 0.5
 
         assert os.path.exists("samples/00.png")
+
+
+def test_with_different_hiden():
+    cfg = OmegaConf.load(f"configs/default.yaml")
+
+    cfg.unet_params = [3, 3, 128]
+
+    cfg.cfg_name = f"test_1_epoch_unet_{cfg.unet_params}"
+
+    losses_original_hs = main(cfg)
+
+    cfg.unet_params = [3, 3, 64]
+
+    cfg.cfg_name = f"test_1_epoch_unet_{cfg.unet_params}"
+
+    losses_not_original_hs = main(cfg)
+
+    assert losses_original_hs["train_loss"] < losses_not_original_hs["train_loss"]
+
+    assert losses_original_hs["train_loss_ema"] < losses_not_original_hs["train_loss_ema"]
