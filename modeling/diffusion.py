@@ -43,7 +43,7 @@ class DiffusionModel(nn.Module):
             eps = self.eps_model(x_i, torch.tensor(i / self.num_timesteps).repeat(num_samples, 1).to(device))
             x_i = self.inv_sqrt_alphas[i].to(device) * (x_i - self.one_minus_alpha_over_prod[i].to(device) * eps) + \
                   (self.sqrt_betas[i] * z).to(device)
-        x_i = torch.clamp((x_i * 0.5 + 0.5) * 255, 0, 1)
+        x_i = torch.clamp((x_i * 0.5 + 0.5), 0, 1)
         return torch.cat((self.x_0, x_i), 0)
 
 
