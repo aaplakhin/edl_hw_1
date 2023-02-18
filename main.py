@@ -77,6 +77,7 @@ def main(cfg: DictConfig):
     losses = None
     for i in range(cfg.num_epochs):
         losses = train_epoch(ddpm, dataloader, optim, cfg.device)
+
         if not cfg.test_cpu:
             generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
 

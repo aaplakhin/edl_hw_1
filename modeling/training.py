@@ -36,6 +36,7 @@ def generate_samples(model: DiffusionModel, device: str, path: str, num_epoch: i
     model.eval()
     with torch.no_grad():
         samples = model.sample(8, (3, 32, 32), device, num_epoch)
+        samples = torch.clamp(samples * 0.5 + 0.5, 0, 1)
         grid = make_grid(samples, nrow=8)
         save_image(grid, path)
         return grid
