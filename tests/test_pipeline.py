@@ -75,7 +75,7 @@ def test_with_different_hiden():
     cfg = OmegaConf.load(f"configs/default.yaml")
 
     cfg.unet_params = [3, 3, 128]
-
+    cfg.num_epochs = 1
     cfg.cfg_name = f"test_1_epoch_unet_{cfg.unet_params}"
 
     losses_original_hs = main(cfg)
