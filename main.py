@@ -20,9 +20,9 @@ def main(cfg: DictConfig):
     if not os.path.exists("used_configs/"):
         os.makedirs("used_configs/")
 
-    OmegaConf.save(cfg, "used_configs/used_config.yaml")
+    OmegaConf.save(cfg, f"used_configs/used_config_{cfg.cfg_name}.yaml")
 
-    wandb.run.log_code(root="outputs", name="used_config",
+    wandb.run.log_code(root="used_configs", name="used_config",
                        include_fn=lambda path: path.endswith(".yaml"))
 
     ddpm = DiffusionModel(
@@ -75,8 +75,6 @@ def main(cfg: DictConfig):
 
         wandb.log({"samples": wandb.Image(f"samples/{i:02d}.png"),
                    "lr": optim.param_groups[-1]["lr"]})
-
-        wandb.log({"lr"})
 
 
 if __name__ == "__main__":
