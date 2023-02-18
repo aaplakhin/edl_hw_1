@@ -1,4 +1,4 @@
-name: "week_02_edl"
+name: "week_2_edl"
 device: "cuda"
 optimizer: "adam"
 eps_adam: 1e-08
