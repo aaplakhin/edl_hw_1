@@ -28,6 +28,7 @@ def train_dataset():
 @pytest.mark.parametrize(["device"], [["cpu"], ["cuda"]])
 def test_train_on_one_batch(device, train_dataset):
     # note: you should not need to increase the threshold or change the hyperparameters
+    torch.manual_seed(0)
     ddpm = DiffusionModel(
         eps_model=UnetModel(3, 3, hidden_size=32),
         betas=(1e-4, 0.02),
@@ -64,9 +65,9 @@ def test_training_epoch_with_hydra(device):
     assert used_cfg.num_epochs == 1
 
     if device != "cpu":
-        assert losses["train_loss"] < 0.5
+        assert losses["train_loss"] < 0.3
 
-        assert losses["train_loss_ema"] < 0.5
+        assert losses["train_loss_ema"] < 0.3
 
         assert os.path.exists("samples/00.png")
 

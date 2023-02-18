@@ -27,7 +27,7 @@ def train_epoch(model: DiffusionModel, dataloader: DataLoader, optimizer: Optimi
         loss_ema = train_loss if loss_ema is None else 0.9 * loss_ema + 0.1 * train_loss
         pbar.set_description(f"loss: {loss_ema:.4f}")
 
-        wandb.log({'train_loss': train_loss.item(), 'train_loss_ema': train_loss.item()})
+        wandb.log({'train_loss': train_loss.item(), 'train_loss_ema': loss_ema.item()})
 
     return {'train_loss': train_loss.item(), 'train_loss_ema': loss_ema.item()}
 
