@@ -13,3 +13,4 @@ num_timesteps: 1000
 num_epochs: 100
 cfg_name: "default"
 api_key: f584b3b7e8a09e6e6af3c36642280e28f629a518
+test_cpu: False

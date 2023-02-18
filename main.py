@@ -3,7 +3,7 @@ import torch
 import wandb
 import hydra
 from omegaconf import DictConfig, OmegaConf
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from torchvision import transforms
 from torchvision.datasets import CIFAR10
 
@@ -54,9 +54,15 @@ def main(cfg: DictConfig):
 
     wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:64]]})
 
-    dataloader = DataLoader(dataset, batch_size=cfg.batch_size,
-                            num_workers=cfg.num_workers,
-                            shuffle=True)
+    if cfg.test_cpu:
+        dataset_cpu = Subset(dataset, [i for i in range(128)])
+        dataloader = DataLoader(dataset_cpu, batch_size=cfg.batch_size,
+                                num_workers=cfg.num_workers,
+                                shuffle=True)
+    else:
+        dataloader = DataLoader(dataset, batch_size=cfg.batch_size,
+                                num_workers=cfg.num_workers,
+                                shuffle=True)
 
     if cfg.optimizer == "adam":
         optim = torch.optim.Adam(ddpm.parameters(), lr=cfg.lr, eps=cfg.eps_adam)

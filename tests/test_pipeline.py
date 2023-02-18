@@ -9,7 +9,7 @@ from torchvision.datasets import CIFAR10
 from omegaconf import DictConfig, OmegaConf
 
 from modeling.diffusion import DiffusionModel
-from modeling.training import train_step
+from modeling.training import train_step, train_epoch
 from modeling.unet import UnetModel
 from main import main
 
@@ -46,15 +46,15 @@ def test_train_on_one_batch(device, train_dataset):
     assert loss < 0.5
 
 
-def test_training_epoch_gpu_with_hydra_and_wandb():
+@pytest.mark.parametrize(["device"], [["cpu"], ["cuda"]])
+def test_training_epoch_gpu_with_hydra_and_wandb(device):
 
     cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../configs/default.yaml")
 
-    cfg.num_epochs = 1
+    cfg.num_epochs, cfg.device, cfg.name = 1, device, f"test_1_epoch_{device}"
 
-    cfg.device = "cuda"
-
-    cfg.name = 'test_1_epoch_gpu'
+    if device == "cpu":
+        cfg.test_cpu = True
 
     main(cfg)
 
