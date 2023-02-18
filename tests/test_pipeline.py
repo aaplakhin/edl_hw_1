@@ -76,13 +76,13 @@ def test_with_different_hiden():
 
     cfg.unet_params = [3, 3, 128]
     cfg.num_epochs = 1
-    cfg.cfg_name = f"test_1_epoch_unet_{cfg.unet_params}"
+    cfg.cfg_name = "test_1_epoch_unet_128"
 
     losses_original_hs = main(cfg)
 
     cfg.unet_params = [3, 3, 64]
 
-    cfg.cfg_name = f"test_1_epoch_unet_{cfg.unet_params}"
+    cfg.cfg_name = "test_1_epoch_unet_64"
 
     losses_not_original_hs = main(cfg)
 
