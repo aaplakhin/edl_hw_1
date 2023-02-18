@@ -28,6 +28,8 @@ def train_epoch(model: DiffusionModel, dataloader: DataLoader, optimizer: Optimi
 
         wandb.log({'train_loss': train_loss.item()})
 
+        wandb.log({'train_loss_ema': train_loss.item()})
+
 
 def generate_samples(model: DiffusionModel, device: str, path: str, num_epoch: int):
     model.eval()

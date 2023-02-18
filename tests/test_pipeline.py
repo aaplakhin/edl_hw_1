@@ -1,12 +1,17 @@
 import pytest
 import torch
+import os
+import wandb
+
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from torchvision.datasets import CIFAR10
+from omegaconf import DictConfig, OmegaConf
 
 from modeling.diffusion import DiffusionModel
 from modeling.training import train_step
 from modeling.unet import UnetModel
+from main import main
 
 
 @pytest.fixture
@@ -41,6 +46,19 @@ def test_train_on_one_batch(device, train_dataset):
     assert loss < 0.5
 
 
-def test_training():
-    # note: implement and test a complete training procedure (including sampling)
-    pass
+@pytest.mark.parametrize(["device"], [["cpu"], ["cuda"]])
+def test_training(device):
+    cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../configs/default.yaml")
+
+    cfg.device = device
+    cfg.num_epochs = 1
+
+    main(cfg)
+
+    assert os.path.exists("used_configs/used_config.yaml")
+
+    assert wandb.summary["train_loss"] < 0.5
+
+    assert wandb.summary["train_loss_ema"] < 0.5
+
+    assert os.path.exists("samples/00.png")

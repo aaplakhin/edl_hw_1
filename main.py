@@ -16,9 +16,12 @@ from modeling.unet import UnetModel
 def main(cfg: DictConfig):
     wandb.init(project=cfg.name, config=OmegaConf.to_container(cfg))
 
-    OmegaConf.save(cfg, "outputs/used_config.yaml")
+    if not os.path.exists("used_configs/"):
+        os.makedirs("used_configs/")
 
-    wandb.run.log_code(root='outputs', name='used_config',
+    OmegaConf.save(cfg, "used_configs/used_config.yaml")
+
+    wandb.run.log_code(root="outputs", name="used_config",
                        include_fn=lambda path: path.endswith(".yaml"))
 
     ddpm = DiffusionModel(
@@ -61,15 +64,18 @@ def main(cfg: DictConfig):
     else:
         raise NotImplemented("This project does not support other optimizers")
 
-    if not os.path.exists('samples/'):
-        os.makedirs('samples/')
+    if not os.path.exists("samples/"):
+        os.makedirs("samples/")
 
     for i in range(cfg.num_epochs):
         train_epoch(ddpm, dataloader, optim, cfg.device)
 
         generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
 
-        wandb.log({"samples": wandb.Image(f"samples/{i:02d}.png")})
+        wandb.log({"samples": wandb.Image(f"samples/{i:02d}.png"),
+                   "lr": optim.param_groups[-1]["lr"]})
+
+        wandb.log({"lr"})
 
 
 if __name__ == "__main__":
