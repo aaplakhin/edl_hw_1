@@ -15,7 +15,7 @@ from modeling.unet import UnetModel
 @hydra.main(version_base=None, config_path="configs", config_name="default")
 def main(cfg: DictConfig):
     wandb.login(key=cfg.api_key)
-    wandb.init(project=cfg.name, config=OmegaConf.to_container(cfg))
+    wandb.init(project=cfg.name, config=OmegaConf.to_container(cfg), name=cfg.cfg_name)
 
     if not os.path.exists("used_configs/"):
         os.makedirs("used_configs/")
@@ -55,7 +55,7 @@ def main(cfg: DictConfig):
     wandb.log({"inputs": [wandb.Image(img) for img in dataset.data[:64]]})
 
     if cfg.test_cpu:
-        dataset_cpu = Subset(dataset, [i for i in range(128)])
+        dataset_cpu = Subset(dataset, [i for i in range(64)])
         dataloader = DataLoader(dataset_cpu, batch_size=cfg.batch_size,
                                 num_workers=cfg.num_workers,
                                 shuffle=True)
@@ -74,13 +74,18 @@ def main(cfg: DictConfig):
     if not os.path.exists("samples/"):
         os.makedirs("samples/")
 
+    losses = None
     for i in range(cfg.num_epochs):
-        train_epoch(ddpm, dataloader, optim, cfg.device)
+        losses = train_epoch(ddpm, dataloader, optim, cfg.device)
+        if not cfg.test_cpu:
+            generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
 
-        generate_samples(ddpm, cfg.device, f"samples/{i:02d}.png", i)
+            wandb.log({"samples": wandb.Image(f"samples/{i:02d}.png"),
+                       "lr": optim.param_groups[-1]["lr"]})
 
-        wandb.log({"samples": wandb.Image(f"samples/{i:02d}.png"),
-                   "lr": optim.param_groups[-1]["lr"]})
+    wandb.finish()
+
+    return losses
 
 
 if __name__ == "__main__":

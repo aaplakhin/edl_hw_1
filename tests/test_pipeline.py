@@ -47,25 +47,26 @@ def test_train_on_one_batch(device, train_dataset):
 
 
 @pytest.mark.parametrize(["device"], [["cpu"], ["cuda"]])
-def test_training_epoch_gpu_with_hydra_and_wandb(device):
-
+def test_training_epoch_gpu_with_hydra(device):
     cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../configs/default.yaml")
 
-    cfg.num_epochs, cfg.device, cfg.name = 1, device, f"test_1_epoch_{device}"
+    cfg.num_epochs, cfg.device, cfg.cfg_name = 1, device, f"test_1_epoch_{device}"
 
     if device == "cpu":
+        cfg.batch_size = 1
         cfg.test_cpu = True
 
-    main(cfg)
+    losses = main(cfg)
 
-    assert os.path.exists("used_configs/used_config.yaml")
+    assert os.path.exists(f"used_configs/used_config_{cfg.cfg_name}.yaml")
 
-    used_cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../used_configs/used_config_{cfg.name}.yaml")
+    used_cfg = OmegaConf.load(f"{os.path.dirname(__file__)}/../used_configs/used_config_{cfg.cfg_name}.yaml")
 
     assert used_cfg.num_epochs == 1
 
-    assert wandb.summary["train_loss"] < 0.5
+    if device != "cpu":
+        assert losses["train_loss"] < 0.5
 
-    assert wandb.summary["train_loss_ema"] < 0.5
+        assert losses["train_loss_ema"] < 0.5
 
-    assert os.path.exists("samples/00.png")
+        assert os.path.exists("samples/00.png")

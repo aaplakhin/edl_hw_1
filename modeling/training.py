@@ -21,6 +21,7 @@ def train_epoch(model: DiffusionModel, dataloader: DataLoader, optimizer: Optimi
     model.train()
     pbar = tqdm(dataloader)
     loss_ema = None
+    train_loss = None
     for x, _ in pbar:
         train_loss = train_step(model, x, optimizer, device)
         loss_ema = train_loss if loss_ema is None else 0.9 * loss_ema + 0.1 * train_loss
@@ -28,7 +29,7 @@ def train_epoch(model: DiffusionModel, dataloader: DataLoader, optimizer: Optimi
 
         wandb.log({'train_loss': train_loss.item(), 'train_loss_ema': train_loss.item()})
 
-    return {'train_loss': train_loss.item(), 'train_loss_ema': train_loss.item()}
+    return {'train_loss': train_loss.item(), 'train_loss_ema': loss_ema.item()}
 
 
 def generate_samples(model: DiffusionModel, device: str, path: str, num_epoch: int):
